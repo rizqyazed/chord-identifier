@@ -4,21 +4,22 @@ let button2;
 let button3;
 let button4;
 let trainButton;
-let featureExtractor;
+let saveButton;
 let classifier;
 let label = "";
 
 
 function setup() {
-  createCanvas(400, 400);
+  createCanvas(windowWidth, windowHeight - 50);
   video = createCapture(VIDEO);
-  video.size(350,350);
-  video.position(400,0);
+  video.size(64, 64);
+  video.hide();
 
   let options = {
-    numLabels: 4,
+    numLabels:4,
     epochs: 50,
   }
+  // classifier = ml5.neuralNetwork(options);
   featureExtractor = ml5.featureExtractor('MobileNet', options, modelLoaded);
   classifier = featureExtractor.classification(video, videoReady)
 
@@ -33,13 +34,15 @@ function setup() {
   button3 = createButton("D Major");
   button3.mousePressed(function() {
     classifier.addImage("D Major");
-    print("test d");
   });
   button4 = createButton("E Major");
   button4.mousePressed(function() {
     classifier.addImage("E Major");
   });
-
+  saveButton = createButton("Save");
+  saveButton.mousePressed(function() {
+    classifier.saveData();
+  })
   trainButton = createButton("Train");
   trainButton.mousePressed(function() {
     classifier.train((lossValue) => {
@@ -53,12 +56,12 @@ function setup() {
   });
 }
 
+
 function gotResults(error, results) {
   if (error) {
     console.log(error);
   } else {
     label = results[0].label;
-    console.log(results);
     classifier.classify(gotResults);
   }
 }
@@ -72,9 +75,12 @@ function videoReady() {
 }
 
 function draw() {
+  
   background(220);
+  imageMode(CENTER);
+  image(video, width/2, height/2 - 50, 250, 250);
   fill(0);
   textSize(64);
   textAlign(CENTER, CENTER);
-  text(label, width/2, height/2);
+  text(label, width/2, height/2 + 120);
 }
